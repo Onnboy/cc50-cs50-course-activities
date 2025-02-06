@@ -1,0 +1,11 @@
+sort1 uses: Bubble Sort
+How do you know?:
+The timings show that the program is very fast for already sorted lists, but significantly slower for inverted lists, which is typical of Bubble Sort.
+
+sort2 uses: Selection Sort
+How do you know?:
+The times were consistent for all input types, indicating that the algorithm traverses the list completely to find the smallest element in each iteration.
+
+sort3 uses: Merge Sort
+How do you know?:
+The times were fast and consistent for all inputs, which is characteristic of Merge Sort, due to its O(n log n) efficiency.
