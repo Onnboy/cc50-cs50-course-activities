@@ -1,0 +1,41 @@
+Comands := sqlite3 songs.db and .schema
+
+In 1.sql, write a SQL query to list the names of all the songs in the database.Your query should produce a table with a single column for each song name.
+SELECT name FROM songs;
+
+In 2.sql, write a SQL query to list the names of all songs in ascending order of tempo. Your query should produce a table with a single column for each song name.
+SELECT name FROM songs ORDER BY tempo ASC;
+
+In 3.sql, write a SQL query to list the names of the 5 longest songs, in descending order of length. Your query should produce a table with a single column for each song name.
+SELECT name FROM songs ORDER BY duration_ms DESC LIMIT 5;
+
+In 4.sql, write a SQL query that lists the names of any songs that have danceability, energy, and valence greater than 0.75. Your query should produce a table with a single column for each song name.
+SELECT name FROM songs WHERE danceability > 0.75 AND energy > 0.75 AND valence > 0.75;
+
+In 5.sql, write a SQL query that returns the average energy of all songs. Your query should generate a table with a single column and a single row containing the average energy.
+SELECT AVG(energy) FROM songs;
+    AVG(energy)
+    0.65906
+
+In 6.sql, write a SQL query that lists the names of Post Malone's songs. Your query should produce a table with a single column for each song name. You should not make any assumptions about what Post Malone's artist_id is.
+SELECT songs.name
+FROM songs
+JOIN artists ON songs.artist_id = artists.id
+WHERE artists.name = 'Post Malone';
+
+In 7.sql, write a SQL query that returns the average energy of Drake's songs. Your query should produce a table with a single column and a single row containing the average energy. You should not make any assumptions about what Drake's artist_id is.
+SELECT AVG(songs.energy)
+FROM songs
+JOIN artists ON songs.artist_id = artists.id
+WHERE artists.name = 'Drake';
+    AVG(songs.energy)
+    0.599
+
+
+In 8.sql, write a SQL query that lists the names of songs that feature “feat.” (participation) from other artists. Songs that feature other artists will include “feat.” in the song name. Your query should generate a table with a single column for each song name.
+SELECT name FROM songs WHERE name LIKE '%feat.%';
+
+
+ENERGY := 0.65906
+
+AVG(songs.energy) := 0.599
