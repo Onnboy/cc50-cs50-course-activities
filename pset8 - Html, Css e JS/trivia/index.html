@@ -1,60 +1,103 @@
 <!DOCTYPE html>
 
 <html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <title>Trivia!</title>
+    <script>
+        let multipleIsAnswered = false; // MOVIDO PARA FORA para ser acessível por todas as funções
+        let freeIsAnswered = false;
 
-    <head>
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
-        <link href="styles.css" rel="stylesheet">
-        <title>Trivia!</title>
-        <script>
-            // TODO: Add code to check answers to questions
-            document.addEventListener('DOMContentLoaded', function listen() {
-                let btnElements = document.querySelectorAll('.multiple');
+        document.addEventListener('DOMContentLoaded', function listen() {
+            let btnElements = document.querySelectorAll('.multiple');
+            let submitBtnElement = document.querySelector('#confirm-btn');
 
-                for (let btnElement of btnElements) {
-                    btnElement.addEventListener('click', event => multipleChoice(event));
-                }
-                function multipleChoice(event) {
-                    const currentBtnElement = event.target;
-                    let newH4ELement = document.createElement('h4');
+            for (let btnElement of btnElements) {
+                btnElement.addEventListener('click', event => multipleChoice(event));
+            }
 
-                    if (currentBtnElement.classList.contains('correct')) {
-                        currentBtnElement.style.background = 'green';
-                        newH4ELement.textContent = 'Correct';
-                    } else {
-                        currentBtnElement.style.background = 'red';
-                        newH4ELement.textContent = 'Incorrect';
-                    }
-                    let divElemnt = currentBtnElement.parentElement;
-                    divElemnt.appendChild(newH4ELement);
-                }
-            });
-        </script>
-    </head>
+            submitBtnElement.addEventListener('click', freeResponse);
+        });
 
-    <body>
-        <div class="header">
-            <h1>Trivia!</h1>
+        function multipleChoice(event) {
+            if (multipleIsAnswered) { // Corrigido para usar a variável correta
+                return;
+            }
+            const currentBtnElement = event.target;
+            let divElement = currentBtnElement.parentElement;
+
+            let existingH4 = divElement.querySelector("h4");
+            if (existingH4) {
+                existingH4.remove();
+            }
+
+            let newH4Element = document.createElement('h4');
+
+            if (currentBtnElement.classList.contains('correct')) {
+                currentBtnElement.style.background = 'green';
+                newH4Element.textContent = 'Correct';
+            } else {
+                currentBtnElement.style.background = 'red';
+                newH4Element.textContent = 'Incorrect';
+            }
+
+            divElement.appendChild(newH4Element);
+            multipleIsAnswered = true; // Corrigido para usar a variável correta
+        }
+
+        function freeResponse() {
+            let answerInputElement = document.querySelector('#free-response');
+            let answer = answerInputElement.value.trim().toLowerCase();
+            let correctAnswer = "linus torvals";
+
+            let divElement = answerInputElement.parentElement;
+
+            let existingH4 = divElement.querySelector("h4");
+            if (existingH4) {
+                existingH4.remove();
+            }
+
+            let newH4Element = document.createElement('h4');
+
+            if (answer === correctAnswer) {
+                answerInputElement.style.background = 'green';
+                newH4Element.textContent = 'Correct!';
+            } else {
+                answerInputElement.style.background = 'red';
+                newH4Element.textContent = 'Incorrect...';
+            }
+
+            divElement.appendChild(newH4Element);
+        }
+    </script>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Trivia!</h1>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h2>Part 1: Multiple Choice </h2>
+            <hr>
+            <h3><i>Who is the best programmer in the world? Choose the correct letter.</i></h3>
+            <button class="multiple incorrect">A) Alan Turing</button>
+            <button class="multiple correct">B) Linus Torvals</button>
+            <button class="multiple incorrect">C) Ada Lovelace</button>
+            <button class="multiple incorrect">D) Donald Knuth</button>
         </div>
 
-        <div class="container">
-            <div class="section">
-                <h2>Part 1: Multiple Choice </h2>
-                <hr>
-                <!-- TODO: Add multiple choice question here -->
-                <h3><i>Who is the best programmer in the world? Choose the correct letter.</i></h3>
-                <button class="multiple incorrect">A) Alan Turing</button>
-                <button class="multiple incorrect">B) Linus Torvals</button>
-                <button class="multiple correct">C) Ada Lovelace</button>
-                <button class="multiple incorrect">D) Donald Knuth</button>
-            </div>
-
-            <div class="section">
-                <h2>Part 2: Free Response</h2>
-                <hr>
-                <!-- TODO: Add free response question here -->
-            </div>
+        <div class="section">
+            <h2>Part 2: Free Response</h2>
+            <hr>
+            <h3>Tell us your honest and open opinion! Who, in your opinion, is the best programmer in the world? Or
+                which of the 4 above do you agree is the best?</h3>
+            <input id="free-response" type="text" placeholder="Type your answers...">
+            <button id="confirm-btn">Submit answer</button>
         </div>
-    </body>
+    </div>
+</body>
 
 </html>
