@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+        <link href="styles.css" rel="stylesheet">
+        <title>Trivia!</title>
+        <script>
+            // TODO: Add code to check answers to questions
+            document.addEventListener('DOMContentLoaded', function listen() {
+                let btnElements = document.querySelectorAll('.multiple');
+
+                for (let btnElement of btnElements) {
+                    btnElement.addEventListener('click', event => multipleChoice(event));
+                }
+                function multipleChoice(event) {
+                    const currentBtnElement = event.target;
+                    let newH4ELement = document.createElement('h4');
+
+                    if (currentBtnElement.classList.contains('correct')) {
+                        currentBtnElement.style.background = 'green';
+                        newH4ELement.textContent = 'Correct';
+                    } else {
+                        currentBtnElement.style.background = 'red';
+                        newH4ELement.textContent = 'Incorrect';
+                    }
+                    let divElemnt = currentBtnElement.parentElement;
+                    divElemnt.appendChild(newH4ELement);
+                }
+            });
+        </script>
+    </head>
+
+    <body>
+        <div class="header">
+            <h1>Trivia!</h1>
+        </div>
+
+        <div class="container">
+            <div class="section">
+                <h2>Part 1: Multiple Choice </h2>
+                <hr>
+                <!-- TODO: Add multiple choice question here -->
+                <h3><i>Who is the best programmer in the world? Choose the correct letter.</i></h3>
+                <button class="multiple incorrect">A) Alan Turing</button>
+                <button class="multiple incorrect">B) Linus Torvals</button>
+                <button class="multiple correct">C) Ada Lovelace</button>
+                <button class="multiple incorrect">D) Donald Knuth</button>
+            </div>
+
+            <div class="section">
+                <h2>Part 2: Free Response</h2>
+                <hr>
+                <!-- TODO: Add free response question here -->
+            </div>
+        </div>
+    </body>
+
+</html>
