@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+            crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="styles.css">
+        <title>IoT e Cyber Security</title>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="index.html">Meu Site</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="iot.html">IoT & Cyber</a></li>
+                    <li class="nav-item active"><a class="nav-link" href="sobre.html">Sobre</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contato.html">Contato</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container mt-4">
+            <h1>🔌🔒 Internet das Coisas (IoT) - Curiosidades e Tecnologia</h1>
+            <p>Descubra as placas mais usadas, curiosidades e desafios da IoT.</p>
+
+            <!-- Imagens das placas mais usadas -->
+            <h2>🔷 Principais Placas Usadas em IoT Desde o Básico até o Avançado</h2>
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <img src="https://storage.googleapis.com/circuitar-web-media/CACHE/images/project/4/images/arduino_uno/5d270d1f0bee4406bf0dd357490d5711.jpg"
+                        class="img-fluid" alt="Arduino Uno">
+                    <p><b>Arduino Uno</b> - Ideal para projetos básicos e aprendizado.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <img src="https://cdn.awsli.com.br/78/78150/produto/5484377/87989cf271.jpg" class="img-fluid"
+                        alt="ESP8266">
+                    <p><b>ESP8266</b> - Placa Wi-Fi compacta e poderosa para IoT.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTD8n25xHvENI0jUYYqTHRNyYbKkT_v6JPe3w&s"
+                        class="img-fluid" alt="Raspberry Pi 4">
+                    <p><b>Raspberry Pi 4</b> - Computador completo para projetos avançados.</p>
+                </div>
+            </div>
+
+            <!-- Tabela Comparativa -->
+            <h2>📊 Comparação entre Placas</h2>
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Placa</th>
+                        <th>Processador</th>
+                        <th>Conectividade</th>
+                        <th>Preço Aproximado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Arduino Uno</td>
+                        <td>ATmega328P</td>
+                        <td>USB</td>
+                        <td>R$ 50 - R$ 80</td>
+                    </tr>
+                    <tr>
+                        <td>ESP8266</td>
+                        <td>Tensilica Xtensa LX106</td>
+                        <td>Wi-Fi</td>
+                        <td>R$ 30 - R$ 60</td>
+                    </tr>
+                    <tr>
+                        <td>Raspberry Pi 4</td>
+                        <td>Broadcom BCM2711</td>
+                        <td>Wi-Fi, Bluetooth, Ethernet</td>
+                        <td>R$ 300 - R$ 500</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Curiosidades Interativas -->
+            <h2>🧠 Curiosidades sobre IoT</h2>
+            <button id="curiosidade-btn" class="btn btn-primary">Ver Curiosidade</button>
+            <p id="curiosidade-text" class="mt-3"></p>
+
+            <!-- FAQ -->
+            <h2>❓ Perguntas Frequentes</h2>
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq1">O que é IoT?</button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">IoT é a interconexão de dispositivos físicos à internet para coletar
+                            e compartilhar dados. IoT é a sigla para Internet das Coisas, que é uma rede de objetos e
+                            dispositivos conectados à internet. Esses dispositivos são equipados com sensores e outras
+                            tecnologias que permitem que eles recebam e transmitam dados. Permitindo que os dispositivos
+                            "inteligentes" coletem e troquem dados, facilitando a comunicação e a
+                            automação.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq2">Quais são os riscos de IoT?</button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">Os principais riscos envolvem privacidade, segurança e ataques
+                            cibernéticos. Os dispositivos IoT podem ser vulneráveis a diversos riscos de segurança, como
+                            violações de dados, ataques de negação de serviço (DoS) e sequestro de dispositivos e
+                            executando a famosa coleta de information gathering para futuro pentest.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const curiosidades = [
+                "O primeiro dispositivo IoT foi uma máquina de Coca-Cola monitorada online em 1982.",
+                "Estima-se que haverá mais de 75 bilhões de dispositivos IoT conectados até 2025.",
+                "Os sensores de IoT podem ajudar a reduzir o consumo de energia em até 30%.",
+                "O termo 'Internet das Coisas' foi popularizado em 1999 por Kevin Ashton.",
+                "Dispositivos IoT podem melhorar a agricultura, monitorando umidade do solo e clima.",
+                "A IoT é composta por três componentes: o dispositivo, a conectividade e a nuvem.",
+                "A IoT pode ter impactos ambientais negativos devido ao lixo eletrônico.",
+                " Computadores não fazem parte da Internet das Coisas.",
+                "É preciso falar inglês para ter melhor desempenho!"
+            ];
+            document.getElementById("curiosidade-btn").addEventListener("click", function () {
+                const randomCuriosity = curiosidades[Math.floor(Math.random() * curiosidades.length)];
+                document.getElementById("curiosidade-text").innerText = randomCuriosity;
+            });
+        </script>
+    </body>
+
+</html>
+
+"Dicas de segurança online".
