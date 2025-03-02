@@ -97,11 +97,8 @@ def buy():
 @login_required
 def history():
     """Show history of transactions"""
-    transactions = db.execute(
-        "SELECT symbol, shares, price FROM transactions WHERE user_id = ? ORDER BY id DESC",
-        session["user_id"]
-    )
-
+    user_id = session["user_id"]
+    transactions = db.execute("SELECT * FROM transactions WHERE user_id = :id", id=user_id)
     return render_template("history.html", transactions=transactions)
 
 @app.route("/login", methods=["GET", "POST"])
@@ -147,17 +144,30 @@ def quote():
     if request.method == "POST":
         symbol = request.form.get("symbol")
         stock = lookup(symbol)
-        if not stock:
-            return apology("Invalid symbol", 400)
-        return render_template("quote.html", stock=stock)
+        
+        name = stock.get("name", stock["symbol"])
+
+        if not stock or "price" not in stock or "symbol" not in stock:
+            return apology("Invalid symbol or API error", 400)
+        
+        name = stock.get("name", stock["symbol"])
+
+        return render_template("quoted.html", name=name, price=usd(stock["price"]), symbol=stock["symbol"])
+
     return render_template("quote.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    if request.method == "POST":
+    if request.method == "GET":
+        return render_template("register.html")
+    else:
         username = request.form.get("username")
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
+    
+        #username = request.form.get("username")
+        #password = request.form.get("password")
+        #confirmation = request.form.get("confirmation")
 
         if not username or not password or not confirmation:
             return apology("Fill in all fields", 400)
@@ -168,10 +178,11 @@ def register():
         hash_password = generate_password_hash(password)
 
         try:
-            db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", username, hash_password)
+            new_user = db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", username, hash_password)
         except:
             return apology("User already exists", 400)
 
+        session["user_id"] = new_user
         return redirect("/login")
 
     return render_template("register.html")
@@ -181,6 +192,10 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
+    # Recupera a lista de símbolos ANTES de qualquer lógica de venda
+    stocks = db.execute("SELECT symbol FROM portfolio WHERE user_id = ?", session["user_id"])
+    symbols = [stock["symbol"] for stock in stocks]
+
     if request.method == "POST":
         symbol = request.form.get("symbol")
         try:
@@ -194,7 +209,7 @@ def sell():
             "SELECT shares FROM portfolio WHERE user_id = ? AND symbol = ?", session["user_id"], symbol
         )
         if not stock_owned or stock_owned[0]["shares"] < shares:
-            return apology("Not enough shares", 400)
+            return apology("Insufficient actions", 400)
 
         stock = lookup(symbol)
         if not stock:
@@ -204,15 +219,16 @@ def sell():
         revenue = shares * price
 
         db.execute("UPDATE portfolio SET shares = shares - ? WHERE user_id = ? AND symbol = ?", shares, session["user_id"], symbol)
-        db.execute("DELETE FROM portfolio WHERE shares = 0")
+        db.execute("DELETE FROM portfolio WHERE user_id = ? AND shares = 0", session["user_id"])
 
         db.execute("UPDATE users SET cash = cash + ? WHERE id = ?", revenue, session["user_id"])
 
         db.execute("""
             INSERT INTO transactions (user_id, symbol, shares, price)
-            VALUES (?, ?, ?, ?) """, session["user_id"], symbol, shares, price)
-        
-        flash("Stock sold successfully!")
+            VALUES (?, ?, ?, ?) """, session["user_id"], symbol, -shares, price)
+
+        flash("Sold successfully!")
         return redirect("/")
-    
-    return render_template("sell.html")
+
+    return render_template("sell.html", symbols=symbols)
+

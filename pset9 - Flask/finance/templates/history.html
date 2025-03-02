@@ -1,10 +1,30 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Transaction History
+Transaction History
 {% endblock %}
 
 {% block main %}
-    <h1>Transaction History</h1>
-    <p>Here you will see your transaction history.</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Symbols</th>
+            <th scope="col">Shares</th>
+            <th scope="col">Price</th>
+            <th scope="col">Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stock in transactions %}
+        <tr>
+            <td>{{ stock.symbol }}</td>
+            <td>
+                {% if stock.shares < 0 %} Sold ( {{ -stock.shares }} ) {% else %} Bought ( {{ stock.shares }} ) {% endif %}
+                    </td>
+            <td>${{ "%.2f"|format(stock.price) }}</td>
+            <td>{{ stock.timestamp }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
