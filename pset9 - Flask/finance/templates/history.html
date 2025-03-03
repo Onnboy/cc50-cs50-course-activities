@@ -5,6 +5,7 @@ Transaction History
 {% endblock %}
 
 {% block main %}
+<h3>Stock Transactions</h3>
 <table class="table">
     <thead>
         <tr>
@@ -19,12 +20,40 @@ Transaction History
         <tr>
             <td>{{ stock.symbol }}</td>
             <td>
-                {% if stock.shares < 0 %} Sold ( {{ -stock.shares }} ) {% else %} Bought ( {{ stock.shares }} ) {% endif %}
+                {% if stock.shares < 0 %} Sold ({{ -stock.shares }}) {% else %} Bought ({{ stock.shares }}) {% endif %}
                     </td>
             <td>${{ "%.2f"|format(stock.price) }}</td>
-            <td>{{ stock.timestamp }}</td>
+            <td> {{ stock.transacted  }} {{ stock.timestamp }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+<h3>Cash Deposits</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Amount</th>
+            <th scope="col">Status</th>
+            <th scope="col">Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cash in cash_transactions %}
+        <tr>
+            <td>${{ "%.2f"|format(cash.amount) }}</td>
+            <td>
+                {% if cash.status == "Approved" %}
+                <span class="text-success">Approved</span>
+                {% elif cash.status == "Pending" %}
+                <span class="text-warning">Pending</span>
+                {% else %}
+                <span class="text-danger">Denied</span>
+                {% endif %}
+            </td>
+            <td>{{ cash.timestamp }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}

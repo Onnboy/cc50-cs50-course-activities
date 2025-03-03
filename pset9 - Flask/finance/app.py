@@ -1,24 +1,18 @@
 import os
-
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-
 from helpers import apology, login_required, lookup, usd
 
-# Configure application
 app = Flask(__name__)
 
-# Custom filter
 app.jinja_env.filters["usd"] = usd
 
-# Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///finance.db")
 
 
@@ -98,8 +92,42 @@ def buy():
 def history():
     """Show history of transactions"""
     user_id = session["user_id"]
-    transactions = db.execute("SELECT * FROM transactions WHERE user_id = :id", id=user_id)
-    return render_template("history.html", transactions=transactions)
+
+    transactions = db.execute("SELECT symbol, shares, price, transacted FROM transactions WHERE user_id = ? ORDER BY transacted DESC", session["user_id"])
+
+    cash_transactions = db.execute("SELECT amount, status, timestamp FROM cash_transactions WHERE user_id = :user_id",
+                                   user_id=user_id)
+
+    return render_template("history.html", transactions=transactions, cash_transactions=cash_transactions)
+
+@app.route("/add_cash", methods=["GET", "POST"])
+@login_required
+def add_cash():
+    """User can add cash"""
+    if request.method == "GET":
+        return render_template("add_cash.html")
+    
+    else:
+        try:
+            new_cash = float(request.form.get("new_cash"))
+        except ValueError:
+            return apology("Invalid amount")
+
+        if not request.form.get("new_cash"):
+            return apology("Please enter an amount", 400)
+
+        user_id = session["user_id"]
+
+        # Registrar a transação de adição de saldo na tabela cash_transactions
+        db.execute("INSERT INTO cash_transactions (user_id, amount, status) VALUES (:user_id, :amount, 'Approved')",
+                   user_id=user_id, amount=new_cash)
+
+        # Atualizar saldo do usuário na tabela users
+        db.execute("UPDATE users SET cash = cash + :amount WHERE id = :id",
+                   amount=new_cash, id=user_id)
+
+        flash(f"Successfully added ${new_cash:.2f}!", "success", 200)
+        return redirect("/history")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -149,8 +177,6 @@ def quote():
 
         if not stock or "price" not in stock or "symbol" not in stock:
             return apology("Invalid symbol or API error", 400)
-        
-        name = stock.get("name", stock["symbol"])
 
         return render_template("quoted.html", name=name, price=usd(stock["price"]), symbol=stock["symbol"])
 
@@ -219,7 +245,7 @@ def sell():
         revenue = shares * price
 
         db.execute("UPDATE portfolio SET shares = shares - ? WHERE user_id = ? AND symbol = ?", shares, session["user_id"], symbol)
-        db.execute("DELETE FROM portfolio WHERE user_id = ? AND shares = 0", session["user_id"])
+        db.execute("DELETE FROM portfolio WHERE user_id = ? AND symbol = ? AND shares = 0", session["user_id"], symbol)
 
         db.execute("UPDATE users SET cash = cash + ? WHERE id = ?", revenue, session["user_id"])
 

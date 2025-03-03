@@ -7,10 +7,10 @@
 {% block main %}
     <h1>Buy Stocks</h1>
     <form action="/buy" method="post">
-        <div>
+        <div class="mb-3">
             <input autocomplete="off" autofocus class="form-control mx-auto w-auto" type="text" name="symbol" placeholder="Symbol" required>
         </div>
-        <div>
+        <div class="mb-3">
             <input  autocomplete="off" autofocus class="form-control mx-auto w-auto" type="number" name="shares" placeholder="Shares" min="1" required>
         </div>
         <button class="btn btn-primary" type="submit">Buy</button>
