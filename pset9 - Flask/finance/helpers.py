@@ -1,4 +1,5 @@
 import requests
+import re
 from flask import redirect, render_template, session
 from functools import wraps
 
@@ -66,3 +67,13 @@ def lookup(symbol):
 def usd(value):
     """Format value as USD."""
     return f"${value:,.2f}"
+
+def validate_password(password):
+    """Verifica se a senha atende aos requisitos mínimos"""
+    if len(password) < 8:
+        return "Password must be at least 8 characters long."
+    if not re.search(r"\d", password):  # Verifica se tem pelo menos um número
+        return "Password must contain at least one number."
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):  # Verifica se tem pelo menos um símbolo especial
+        return "Password must contain at least one special character (!@#$%^&*(),.?\":{}|<>)."
+    return None  # Senha válida

@@ -4,7 +4,7 @@ from cs50 import SQL
 from flask import Flask, render_template, url_for, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import apology, login_required, lookup, usd
+from helpers import apology, login_required, lookup, usd, validate_password
 
 app = Flask(__name__)
 
@@ -62,10 +62,8 @@ def index():
 @app.route("/change_password", methods=["GET", "POST"])
 @login_required
 def change_password():
-    if "user_id" not in session:
-        flash("You must be logged in to change your password.", "warning")
-        return redirect("/login")
-
+    """Allows the user to change their password"""
+    
     if request.method == "POST":
         current_password = request.form.get("current_password")
         new_password = request.form.get("new_password")
@@ -79,30 +77,27 @@ def change_password():
             flash("New passwords do not match.", "danger")
             return redirect("/change_password")
 
-        conn = sqlite3.connect("finance.db")
-        db = conn.cursor()
-    
-        db.execute("SELECT hash FROM users WHERE id = ?", (session["user_id"],))
-        row = db.fetchone()
-        
-        print("Tabelas existentes:", db.fetchall())  # Isso mostrará todas as tabelas disponíveis no terminal
-
-        if not row or not check_password_hash(row[0], current_password):
-            flash("Current password is incorrect.", "danger")
-            conn.close()
+        # Verificar se a nova senha atende aos critérios mínimos
+        error_message = validate_password(new_password)
+        if error_message:
+            flash(error_message, "danger")
             return redirect("/change_password")
 
+        # Buscar a senha atual no banco de dados
+        row = db.execute("SELECT hash FROM users WHERE id = ?", session["user_id"])
+        
+        if not row or not check_password_hash(row[0]["hash"], current_password):
+            flash("Current password is incorrect.", "danger")
+            return redirect("/change_password")
+
+        # Atualizar a senha do usuário
         hashed_password = generate_password_hash(new_password)
-        db.execute("UPDATE users SET hash = ? WHERE id = ?", (hashed_password, session["user_id"]))
-        conn.commit()
-        conn.close()
+        db.execute("UPDATE users SET hash = ? WHERE id = ?", hashed_password, session["user_id"])
 
         flash("Password successfully changed!", "success")
         return redirect("/")
 
     return render_template("change_password.html")
-
-
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
@@ -270,6 +265,11 @@ def register():
         if password != confirmation:
             return apology("Passwords do not match", 400)
 
+         # Validar senha antes de armazenar
+        error_message = validate_password(password)
+        if error_message:
+            return apology(error_message, 400)
+        
         hash_password = generate_password_hash(password)
 
         try:
@@ -279,9 +279,6 @@ def register():
 
         session["user_id"] = new_user
         return redirect("/login")
-
-    return render_template("register.html")
-
 
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
