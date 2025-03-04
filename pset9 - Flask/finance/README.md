@@ -26,7 +26,7 @@ Werkzeug: Utilizado para hashing de senhas.
 
 Bootstrap: Para estilização e responsividade.
 
-Estrutura do Projeto
+Estrutura do Projeto:
 
 finance/
 │──flask_session          # Guardar usuario após registro
@@ -41,7 +41,7 @@ Como executar
 
 Clone o repositório:
 
-git clone https://github.com/Onnboy/cc50-cs50-course-activities
+git clone https://github.com/Onnboy/cc50-cs50-course-activities # Já que o diretorio/pasta(FINANCE) já está mesclada 
 cd finance
 
 Crie um ambiente virtual e instale as dependências:
