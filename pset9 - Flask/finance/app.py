@@ -1,4 +1,5 @@
 import os
+import sqlite3
 from cs50 import SQL
 from flask import Flask, render_template, url_for, flash, redirect, render_template, request, session
 from flask_session import Session
@@ -9,12 +10,26 @@ app = Flask(__name__)
 
 app.jinja_env.filters["usd"] = usd
 
+DATABASE_PATH = os.path.join(os.getcwd(), "finance.db")
+
+def get_db_connection():
+    conn = sqlite3.connect(DATABASE_PATH)
+    conn.row_factory = sqlite3.Row 
+    return conn
+
+conn = get_db_connection()
+db = conn.cursor()
+db.execute("SELECT name FROM sqlite_master WHERE type='table';")
+tables = db.fetchall()
+conn.close()
+
+app.jinja_env.filters["usd"] = usd
+
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 db = SQL("sqlite:///finance.db")
-
 
 @app.after_request
 def after_request(response):
@@ -43,6 +58,50 @@ def index():
         return redirect(url_for("index"))
 
     return render_template("index.html", cash=cash, total=total)
+
+@app.route("/change_password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    if "user_id" not in session:
+        flash("You must be logged in to change your password.", "warning")
+        return redirect("/login")
+
+    if request.method == "POST":
+        current_password = request.form.get("current_password")
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+
+        if not current_password or not new_password or not confirm_password:
+            flash("All fields are required.", "danger")
+            return redirect("/change_password")
+
+        if new_password != confirm_password:
+            flash("New passwords do not match.", "danger")
+            return redirect("/change_password")
+
+        conn = sqlite3.connect("finance.db")
+        db = conn.cursor()
+    
+        db.execute("SELECT hash FROM users WHERE id = ?", (session["user_id"],))
+        row = db.fetchone()
+        
+        print("Tabelas existentes:", db.fetchall())  # Isso mostrará todas as tabelas disponíveis no terminal
+
+        if not row or not check_password_hash(row[0], current_password):
+            flash("Current password is incorrect.", "danger")
+            conn.close()
+            return redirect("/change_password")
+
+        hashed_password = generate_password_hash(new_password)
+        db.execute("UPDATE users SET hash = ? WHERE id = ?", (hashed_password, session["user_id"]))
+        conn.commit()
+        conn.close()
+
+        flash("Password successfully changed!", "success")
+        return redirect("/")
+
+    return render_template("change_password.html")
+
 
 
 @app.route("/buy", methods=["GET", "POST"])
