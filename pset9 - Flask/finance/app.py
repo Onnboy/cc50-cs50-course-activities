@@ -29,20 +29,21 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    stocks = db.execute("SELECT symbol, SUM(shares) AS shares FROM portfolio WHERE user_id = ? GROUP BY symbol", session["user_id"])
+    user_id = session.get("user_id")
+    if not user_id:
+        flash("User not logged in.", "danger")
+        return redirect(url_for("login"))
+    
+    try:
+        user = db.execute("SELECT cash FROM users WHERE id = ?", user_id)
+        cash = user[0]["cash"] if user else 0
+        total = cash 
+    except Exception as e:
+        flash(f"Error fetching user data: {str(e)}", "danger")
+        return redirect(url_for("index"))
 
-    total_value = 0
-    for stock in stocks:
-        stock_info = lookup(stock["symbol"])
-        if stock_info:
-            stock["price"] = stock_info["price"]
-            stock["total"] = stock["shares"] * stock["price"]
-            total_value += stock["total"]
+    return render_template("index.html", cash=cash, total=total)
 
-    user = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
-    cash = user[0]["cash"]
-
-    return render_template("index.html", stocks=stocks, cash=cash, total=total_value + cash)
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
@@ -91,20 +92,19 @@ def buy():
 @login_required
 def history():
     """Show history of transactions"""
-    user_id = session["user_id"]
-
-    transactions = db.execute(
-        "SELECT symbol, shares, price, transacted FROM transactions WHERE user_id = ? ORDER BY transacted DESC",
-        session["user_id"]
-    )
-
-    cash_transactions = db.execute(
-        "SELECT amount, status, timestamp FROM cash_transactions WHERE user_id = :user_id",
-        user_id=user_id
-    )
+    user_id = session.get("user_id")
+    if not user_id:
+        flash("User not logged in.", "danger")
+        return redirect(url_for("login"))
+    
+    try:
+        transactions = db.execute("SELECT symbol, shares, price, transacted FROM transactions WHERE user_id = ? ORDER BY transacted DESC", user_id)
+        cash_transactions = db.execute("SELECT amount, status, timestamp FROM cash_transactions WHERE user_id = ?", user_id)
+    except Exception as e:
+        flash(f"Error fetching history: {str(e)}", "danger")
+        return redirect(url_for("index"))
 
     return render_template("history.html", transactions=transactions, cash_transactions=cash_transactions)
-
 
 @app.route("/add_cash", methods=["GET", "POST"])
 @login_required
@@ -112,34 +112,35 @@ def add_cash():
     """User can add cash"""
     if request.method == "GET":
         return render_template("add_cash.html")
-
-    # Verificar se um valor foi inserido
-    new_cash = request.form.get("new_cash")
-    if not new_cash:
-        return apology("Please enter an amount", 400)
-
-    try:
-        new_cash = float(new_cash)
-        if new_cash <= 0:
-            return apology("Amount must be greater than zero", 400)
-    except ValueError:
-        return apology("Invalid amount", 400)
-
-    user_id = session["user_id"]
-
-    db.execute(
-        "INSERT INTO cash_transactions (user_id, amount, status) VALUES (:user_id, :amount, 'Approved')",
-        user_id=user_id, amount=new_cash
-    )
-
-    db.execute(
-        "UPDATE users SET cash = cash + :amount WHERE id = :id",
-        amount=new_cash, id=user_id
-    )
-
-    flash(f"Successfully added ${new_cash:.2f}!", "success")
     
-    return redirect(url_for("history"))
+    else:
+        try:
+            new_cash = float(request.form.get("new_cash"))
+            if new_cash <= 0:
+                flash("Amount must be a positive number.", "danger")
+                return redirect(url_for("add_cash"))
+        except ValueError:
+            flash("Invalid amount entered.", "danger")
+            return redirect(url_for("add_cash"))
+
+        user_id = session.get("user_id")
+        if not user_id:
+            flash("User not logged in.", "danger")
+            return redirect(url_for("login"))
+
+        try:
+            db.execute("INSERT INTO cash_transactions (user_id, amount, status) VALUES (?, ?, 'Approved')",
+                       user_id, new_cash)
+            
+            db.execute("UPDATE users SET cash = cash + ? WHERE id = ?",
+                       new_cash, user_id)
+            
+            flash(f"Successfully added ${new_cash:.2f}!", "success")
+            return redirect(url_for("history"))
+        
+        except Exception as e:
+            flash(f"Database error: {str(e)}", "danger")
+            return redirect(url_for("add_cash"))
  
 
 @app.route("/login", methods=["GET", "POST"])
