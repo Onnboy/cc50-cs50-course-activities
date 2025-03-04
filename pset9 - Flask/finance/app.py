@@ -127,13 +127,11 @@ def add_cash():
 
     user_id = session["user_id"]
 
-    # Registrar a transação de adição de saldo na tabela cash_transactions
     db.execute(
         "INSERT INTO cash_transactions (user_id, amount, status) VALUES (:user_id, :amount, 'Approved')",
         user_id=user_id, amount=new_cash
     )
 
-    # Atualizar saldo do usuário na tabela users
     db.execute(
         "UPDATE users SET cash = cash + :amount WHERE id = :id",
         amount=new_cash, id=user_id
@@ -233,7 +231,6 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
-    # Recupera a lista de símbolos ANTES de qualquer lógica de venda
     stocks = db.execute("SELECT symbol FROM portfolio WHERE user_id = ?", session["user_id"])
     symbols = [stock["symbol"] for stock in stocks]
 
